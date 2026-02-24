@@ -1,5 +1,5 @@
 name: product_impressions
-version: 1
+version: 2
 description: Event group for all product impressions
 
 events:

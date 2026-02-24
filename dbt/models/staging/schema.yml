@@ -82,4 +82,4 @@ models:
     tests:
     - not_null
   name: stg_product_view
-version: 1
+version: 2

@@ -6,7 +6,7 @@ OUT_DIR = Path("dbt/models/staging")
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 schema_yaml = {
-    "version": 1,
+    "version": 2,
     "models": []
 }
 

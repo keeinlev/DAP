@@ -1,5 +1,5 @@
 name: product_click
-version: 1
+version: 2
 description: User clicks on a product
 
 timestamp_field: ts

@@ -19,4 +19,4 @@ models:
     tests:
     - not_null
   name: int_product_impressions
-version: 1
+version: 2

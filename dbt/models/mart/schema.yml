@@ -1,0 +1,28 @@
+models:
+- columns:
+  - name: user_id
+    tests:
+    - not_null
+  - name: product_id
+    tests:
+    - not_null
+  - name: date
+    tests:
+    - not_null
+  - name: impressions
+    tests:
+    - not_null
+  - name: avg_dwell_time
+    tests:
+    - not_null
+  - name: clicks
+    tests:
+    - not_null
+  - name: add_to_carts
+    tests:
+    - not_null
+  - name: orders
+    tests:
+    - not_null
+  name: mart_product_engagement_daily
+version: 2

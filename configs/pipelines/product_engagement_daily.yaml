@@ -1,0 +1,35 @@
+name: product_engagement_daily
+source: int_product_impressions
+group_keys:
+  user_id:
+    type: string
+  product_id:
+    type: string
+  date:
+    type: date
+    field: ts
+    transforms:
+      - DATE
+      - name: CONVERT_TIMEZONE
+        args:
+          - UTC
+          - America/Toronto
+        field_pos: 2
+metrics:
+  impressions:
+    event: product_view
+    agg: count
+  avg_dwell_time:
+    event: product_view
+    agg: avg
+    fields:
+      - dwell_time
+  clicks:
+    event: product_click
+    agg: count
+  add_to_carts:
+    event: product_add_to_cart
+    agg: count
+  orders:
+    event: product_order
+    agg: count

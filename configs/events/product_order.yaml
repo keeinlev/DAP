@@ -1,5 +1,5 @@
 name: product_order
-version: 1
+version: 2
 description: User orders a product
 
 timestamp_field: ts

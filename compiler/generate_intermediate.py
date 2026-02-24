@@ -1,14 +1,12 @@
 from pathlib import Path
-from jinja2 import Environment, FileSystemLoader
 import yaml
 
 EVENT_GROUPS_DIR = Path("configs/event_groups")
-SQL_TEMPLATE_FILE = "metric_template.sql"
 OUT_DIR = Path("dbt/models/intermediate")
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 schema_yaml = {
-    "version": 1,
+    "version": 2,
     "models": []
 }
 

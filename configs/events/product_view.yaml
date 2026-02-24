@@ -1,5 +1,5 @@
 name: product_view
-version: 1
+version: 2
 description: User views a product
 
 timestamp_field: ts

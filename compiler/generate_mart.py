@@ -98,10 +98,11 @@ for path in MART_PIPELINES_DIR.glob("*.yaml"):
             assert src_fields is not None, f"agg type 'avg' requires 'fields' to be non-empty list for metric {metric}"
             assert len(src_fields) == 1, f"agg type 'avg' requires 'fields' to be a list of length 1 for metric {metric}"
 
+            field_new_alias = f"{event_alias}__{src_fields[0]}"
             required_joins.add(event_type)
-            required_fields.add(f"{event_alias}.{src_fields[0]} AS {src_fields[0]}")
+            required_fields.add(f"{event_alias}.{src_fields[0]} AS {field_new_alias}")
 
-            selects.append(f"AVG(CASE WHEN {row_differentiator}='{event_type}' THEN {src_fields[0]} END) AS {metric}")
+            selects.append(f"AVG(CASE WHEN {row_differentiator}='{event_type}' THEN {field_new_alias} END) AS {metric}")
             schema[metric] = "float"
 
     # A bunch of string formatting and manipulation to get the right expressions
@@ -119,7 +120,7 @@ for path in MART_PIPELINES_DIR.glob("*.yaml"):
 
     sql = f"""{{{{ config(
     materialized='incremental',
-    unique_key={list(group_keys.keys())}
+    unique_key=[{','.join([ f"'{k}'" for k in group_keys.keys() ])}] -- gosh I know this looks so dumb in the Python code but it's to make sure it works across versions of Python
 ) }}}}
 
 WITH base AS (

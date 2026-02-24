@@ -1,6 +1,6 @@
 {{ config(
     materialized='incremental',
-    unique_key=['user_id', 'product_id', 'date']
+    unique_key=['user_id','product_id','date'] -- gosh I know this looks so dumb in the Python code but it's to make sure it works across versions of Python
 ) }}
 
 WITH base AS (
@@ -10,7 +10,7 @@ WITH base AS (
         , ipi.user_id AS user_id
         , ipi.product_id AS product_id
         , DATE(CONVERT_TIMEZONE('UTC', 'America/Toronto', ipi.ts)) AS date
-        , pv.dwell_time AS dwell_time
+        , pv.dwell_time AS pv__dwell_time
     FROM {{ ref('int_product_impressions') }} ipi
     LEFT JOIN {{ ref('stg_product_view') }} pv
     ON ipi.event_id = pv.event_id
@@ -35,7 +35,7 @@ SELECT
     , product_id
     , date
     , COUNT(CASE WHEN event_type='product_view' THEN 1 END) AS impressions
-    , AVG(CASE WHEN event_type='product_view' THEN dwell_time END) AS avg_dwell_time
+    , AVG(CASE WHEN event_type='product_view' THEN pv__dwell_time END) AS avg_dwell_time
     , COUNT(CASE WHEN event_type='product_click' THEN 1 END) AS clicks
     , COUNT(CASE WHEN event_type='product_add_to_cart' THEN 1 END) AS add_to_carts
     , COUNT(CASE WHEN event_type='product_order' THEN 1 END) AS orders

@@ -1,0 +1,85 @@
+models:
+- columns:
+  - name: user_id
+    tests:
+    - not_null
+  - name: visit_id
+    tests:
+    - not_null
+  - name: product_id
+    tests:
+    - not_null
+  - name: request_id
+    tests:
+    - not_null
+  - name: ts
+    tests:
+    - not_null
+  - name: event_id
+    tests:
+    - not_null
+  name: stg_product_add_to_cart
+- columns:
+  - name: user_id
+    tests:
+    - not_null
+  - name: visit_id
+    tests:
+    - not_null
+  - name: product_id
+    tests:
+    - not_null
+  - name: request_id
+    tests:
+    - not_null
+  - name: ts
+    tests:
+    - not_null
+  - name: event_id
+    tests:
+    - not_null
+  name: stg_product_click
+- columns:
+  - name: user_id
+    tests:
+    - not_null
+  - name: visit_id
+    tests:
+    - not_null
+  - name: product_id
+    tests:
+    - not_null
+  - name: request_id
+    tests:
+    - not_null
+  - name: ts
+    tests:
+    - not_null
+  - name: event_id
+    tests:
+    - not_null
+  name: stg_product_order
+- columns:
+  - name: user_id
+    tests:
+    - not_null
+  - name: visit_id
+    tests:
+    - not_null
+  - name: product_id
+    tests:
+    - not_null
+  - name: request_id
+    tests:
+    - not_null
+  - name: dwell_time
+    tests:
+    - not_null
+  - name: ts
+    tests:
+    - not_null
+  - name: event_id
+    tests:
+    - not_null
+  name: stg_product_view
+version: 1

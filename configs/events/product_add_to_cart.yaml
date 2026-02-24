@@ -1,0 +1,14 @@
+name: product_add_to_cart
+version: 1
+description: User adds a product to cart
+
+timestamp_field: ts
+
+schema:
+  user_id: string
+  visit_id: string
+  product_id: string
+  request_id: string
+  ts: timestamp
+
+default_destination: analytics_db

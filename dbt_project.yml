@@ -1,0 +1,10 @@
+name: dap_analytics_dev
+version: 1.0
+profile: dap_analytics_dev
+
+model-paths: ["dbt/models"]
+
+models:
+  analytics:
+    staging:
+      +materialized: view

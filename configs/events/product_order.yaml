@@ -1,0 +1,14 @@
+name: product_order
+version: 1
+description: User orders a product
+
+timestamp_field: ts
+
+schema:
+  user_id: string
+  visit_id: string
+  product_id: string
+  request_id: string
+  ts: timestamp
+
+default_destination: analytics_db

@@ -1,0 +1,15 @@
+name: product_view
+version: 1
+description: User views a product
+
+timestamp_field: ts
+
+schema:
+  user_id: string
+  visit_id: string
+  product_id: string
+  request_id: string
+  dwell_time: float
+  ts: timestamp
+
+default_destination: analytics_db

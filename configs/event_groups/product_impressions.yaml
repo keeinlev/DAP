@@ -1,0 +1,13 @@
+name: product_impressions
+version: 1
+description: Event group for all product impressions
+
+events:
+  - product_view
+  - product_click
+  - product_add_to_cart
+  - product_order
+
+actor_key: user_id
+object_key: product_id
+session_key: request_id

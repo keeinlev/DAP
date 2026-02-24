@@ -5,7 +5,8 @@ WITH unioned AS (
     user_id,
     request_id,
     product_id,
-    ts
+    ts,
+    _ingested_at
   FROM {{ ref('stg_product_view') }}
 
   UNION ALL
@@ -16,7 +17,8 @@ WITH unioned AS (
     user_id,
     request_id,
     product_id,
-    ts
+    ts,
+    _ingested_at
   FROM {{ ref('stg_product_click') }}
 
   UNION ALL
@@ -27,7 +29,8 @@ WITH unioned AS (
     user_id,
     request_id,
     product_id,
-    ts
+    ts,
+    _ingested_at
   FROM {{ ref('stg_product_add_to_cart') }}
 
   UNION ALL
@@ -38,7 +41,8 @@ WITH unioned AS (
     user_id,
     request_id,
     product_id,
-    ts
+    ts,
+    _ingested_at
   FROM {{ ref('stg_product_order') }}
 ),
 

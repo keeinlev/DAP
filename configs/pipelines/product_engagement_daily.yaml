@@ -1,5 +1,7 @@
 name: product_engagement_daily
 source: int_product_impressions
+source_row_differentiator: event_type
+incremental_time_field: _ingested_at
 group_keys:
   user_id:
     type: string

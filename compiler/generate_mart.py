@@ -1,5 +1,6 @@
 from pathlib import Path
 import yaml
+from util import *
 
 MART_PIPELINES_DIR = Path("configs/pipelines")
 OUT_DIR = Path("dbt/models/mart")
@@ -18,6 +19,8 @@ for path in MART_PIPELINES_DIR.glob("*.yaml"):
     group_keys = pipeline_spec["group_keys"]
     name = pipeline_spec["name"]
     metrics = pipeline_spec["metrics"]
+    incremental_time_field = pipeline_spec["incremental_time_field"]
+    row_differentiator = pipeline_spec["source_row_differentiator"]
     filename = f"mart_{name}"
 
     # For dbt auto tests
@@ -29,11 +32,8 @@ for path in MART_PIPELINES_DIR.glob("*.yaml"):
     for gk, body in group_keys.items():
         if "transforms" not in body:
             # Tag ambiguous columns with the source alias
-            # Key to separate select vs group by expressions for when we need to handle column transformations that map to new column aliases
-            group_key_strs[gk] = {
-                "select_expr": f"{source_alias}.{gk}",
-                "groupby_expr": f"{source_alias}.{gk}",
-            }
+            # Allow injecting of any alias later
+            group_key_strs[gk] = f"%s.{gk}"
         else:
             # Handle list of transforms, nest them appropriately
             assert "field" in body, f"if defining a group key with a list of transforms, the operand 'field' must be provided for source {source}"
@@ -59,20 +59,18 @@ for path in MART_PIPELINES_DIR.glob("*.yaml"):
                     transform_str += f"{transform_name}({args1}"
                     transform_end_stack.append(args2 + ")") # Stack the second part of the args + the closing parenthesis
 
-            transform_str += f"{source_alias}.{field}" # Inject the event field
+            transform_str += f"%s.{field}" # Allow for injecting any alias here later
 
             # Do the closing parentheses/second portion of args for each transform we nested
             for _ in range(len(transforms)):
                 transform_str += transform_end_stack.pop()
             
             # This is where separating is important, since we want to hold onto the <expression AS alias> in the SELECT, but we only want <alias> for the GROUP BY
-            group_key_strs[gk] = {
-                "select_expr": transform_str,
-                "groupby_expr": gk,
-            }
+            group_key_strs[gk] = transform_str
 
     # We will populate these as we loop through metrics
     selects = []
+    required_fields = set()
     required_joins = set()
     aliases = {source: source_alias}
 
@@ -91,8 +89,9 @@ for path in MART_PIPELINES_DIR.glob("*.yaml"):
                 event_alias = f"{event_alias}{i}"
             aliases[event_type] = event_alias
 
+        # Defining aggregation codegen
         if agg_type == "count":
-            selects.append(f"COUNT(CASE WHEN {source_alias}.event_type='{event_type}' THEN 1 END) AS {metric}")
+            selects.append(f"COUNT(CASE WHEN {row_differentiator}='{event_type}' THEN 1 END) AS {metric}")
             schema[metric] = "int"
 
         elif agg_type == "avg":
@@ -100,21 +99,55 @@ for path in MART_PIPELINES_DIR.glob("*.yaml"):
             assert len(src_fields) == 1, f"agg type 'avg' requires 'fields' to be a list of length 1 for metric {metric}"
 
             required_joins.add(event_type)
+            required_fields.add(f"{event_alias}.{src_fields[0]} AS {src_fields[0]}")
 
-            selects.append(f"AVG(CASE WHEN {source_alias}.event_type='{event_type}' THEN {aliases[event_type]}.{src_fields[0]} END) AS {metric}")
+            selects.append(f"AVG(CASE WHEN {row_differentiator}='{event_type}' THEN {src_fields[0]} END) AS {metric}")
             schema[metric] = "float"
-    
-    group_key_selects = '\n    , '.join([ f"{v['select_expr']} AS {k}" for k, v in group_key_strs.items() ])
-    metric_selects = '\n    , '.join(selects)
-    join_stmts = '\n'.join([ f"LEFT JOIN {{{{ ref('stg_{join_table}') }}}} {(join_alias := aliases[join_table])}\n    ON {source_alias}.event_id = {join_alias}.event_id\n    AND {source_alias}.event_type='{join_table}'" for join_table in required_joins ])
-    group_bys = '\n    , '.join([ v["groupby_expr"] for v in group_key_strs.values() ])
 
-    sql = f"""SELECT
-    {group_key_selects}
+    # A bunch of string formatting and manipulation to get the right expressions
+    group_key_selects = nldtc.join([ f"{v % source_alias} AS {k}" for k, v in group_key_strs.items() ])
+    required_fields_selects = nlstc.join(required_fields)
+    metric_selects = nlstc.join(selects)
+    join_stmts = '\n'.join([ f"LEFT JOIN {{{{ ref('stg_{join_table}') }}}} {(join_alias := aliases[join_table])}\n    ON {source_alias}.event_id = {join_alias}.event_id\n    AND {source_alias}.{row_differentiator}='{join_table}'" for join_table in required_joins ])
+
+    group_keys_str = nlstc.join(group_keys.keys())
+
+    # Annoying but necessary for including all past events which share the same primary keys as new incoming events, so we don't overwrite past
+    source1 = [ v % source_alias for v in group_key_strs.values() ]
+    source2 = [ v % 'new_rows' for v in group_key_strs.values() ]
+    incremental_filter = nldta.join([ f"{s1} = {s2}" for s1, s2 in zip(source1, source2) ])
+
+    sql = f"""{{{{ config(
+    materialized='incremental',
+    unique_key={list(group_keys.keys())}
+) }}}}
+
+WITH base AS (
+    SELECT
+        {source_alias}.{row_differentiator}
+        , {source_alias}.{incremental_time_field}
+        , {group_key_selects}
+        , {required_fields_selects}
+    FROM {{{{ ref('{source}') }}}} {source_alias}
+    {join_stmts}
+    {{% if is_incremental() %}}
+    WHERE EXISTS (
+        SELECT 1
+        FROM {{{{ ref('{source}') }}}} new_rows
+        WHERE new_rows.{incremental_time_field} > (
+            SELECT COALESCE(MAX({{{{ this }}}}.{incremental_time_field}), '1900-01-01')
+            FROM {{{{ this }}}}
+        )
+        AND {incremental_filter}
+    )
+    {{% endif %}}
+)
+SELECT
+    MAX({incremental_time_field}) as {incremental_time_field}
+    , {group_keys_str}
     , {metric_selects}
-FROM {{{{ ref('{source}') }}}} {source_alias}
-{join_stmts}
-GROUP BY\n    {group_bys}"""
+FROM base
+GROUP BY\n    {group_keys_str}"""
 
     (OUT_DIR / f"{filename}.sql").write_text(sql)
 

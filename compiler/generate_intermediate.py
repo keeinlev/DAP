@@ -22,7 +22,8 @@ for path in EVENT_GROUPS_DIR.glob("*.yaml"):
         event_group["actor_key"]: "string",
         event_group["session_key"]: "string",
         event_group["object_key"]: "string",
-        "ts": "timestamp"
+        "ts": "timestamp",
+        "_ingested_at": "timestamp",
     }
 
     selects = []
@@ -35,7 +36,8 @@ for path in EVENT_GROUPS_DIR.glob("*.yaml"):
     {event_group["actor_key"]},
     {event_group["session_key"]},
     {event_group["object_key"]},
-    ts
+    ts,
+    _ingested_at
   FROM {{{{ ref('stg_{event}') }}}}
 """)
 

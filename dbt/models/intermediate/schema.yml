@@ -18,5 +18,8 @@ models:
   - name: ts
     tests:
     - not_null
+  - name: _ingested_at
+    tests:
+    - not_null
   name: int_product_impressions
 version: 2

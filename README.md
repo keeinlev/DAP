@@ -1,6 +1,8 @@
 # Declarative Analytics Platform (DAP)
 ## February 23, 2026 - Present
 
+![dap](https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExODhoNjVkOG05aXZ3anBnbXlneTg0cTJvdHd2Y29wczZib2g5c2tkYiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/zCHnEV6OQXQoZKEabT/giphy.gif)
+
 DAP is a small declarative analytics system for defining metrics in YAML and compiling them into dbt models on Snowflake.
 
 The goal is to separate *metric intent* from *SQL implementation*, while keeping everything transparent and easy to inspect.

@@ -2,7 +2,7 @@ version: 1
 
 sources:
   - name: raw
-    database: analytics
+    database: analytics_dev2
     schema: raw
     tables:
       - name: events

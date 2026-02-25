@@ -8,7 +8,7 @@ from validator import validate_event
 app = Flask(__name__)
 
 S3_BUCKET = os.environ["EVENT_BUCKET"]
-AWS_REGION = os.environ.get("AWS_REGION", "us-east-1")
+AWS_REGION = os.environ.get("AWS_REGION", "us-east-2")
 
 endpoint = os.environ.get("AWS_ENDPOINT_URL")
 

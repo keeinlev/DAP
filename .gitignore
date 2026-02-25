@@ -3,3 +3,6 @@ minio_data
 __pycache__
 target
 logs
+.terraform*
+terraform.tfstate
+terraform.tfstate.backup

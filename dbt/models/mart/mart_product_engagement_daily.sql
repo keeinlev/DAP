@@ -1,6 +1,6 @@
 {{ config(
     materialized='incremental',
-    unique_key=['user_id','product_id','date'] -- gosh I know this looks so dumb in the Python code but it's to make sure it works across versions of Python
+    unique_key=['user_id','product_id','date']
 ) }}
 
 WITH base AS (

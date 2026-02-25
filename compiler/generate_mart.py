@@ -120,7 +120,7 @@ for path in MART_PIPELINES_DIR.glob("*.yaml"):
 
     sql = f"""{{{{ config(
     materialized='incremental',
-    unique_key=[{','.join([ f"'{k}'" for k in group_keys.keys() ])}] -- gosh I know this looks so dumb in the Python code but it's to make sure it works across versions of Python
+    unique_key=[{','.join([ f"'{k}'" for k in group_keys.keys() ])}]
 ) }}}}
 
 WITH base AS (

@@ -6,3 +6,7 @@ logs
 .terraform*
 terraform.tfstate
 terraform.tfstate.backup
+*auto.tfvars
+keys
+*.pem
+*.pub

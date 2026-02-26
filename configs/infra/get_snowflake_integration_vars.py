@@ -38,15 +38,3 @@ if __name__ == "__main__":
     for key, value in res.items(): print(key, value)
 
     exit(0)
-
-
-# DESC=$(snowflake -o exit_on_error=true -q "DESC INTEGRATION s3_${ENV}_bucket_access;")
-
-# SNOWFLAKE_IAM_USER_ARN=$(echo "$DESC" | grep STORAGE_AWS_IAM_USER_ARN | awk '{print $4}')
-# SNOWFLAKE_EXTERNAL_ID=$(echo "$DESC" | grep STORAGE_AWS_EXTERNAL_ID | awk '{print $4}')
-
-# echo "Snowflake IAM user ARN: $SNOWFLAKE_IAM_USER_ARN"
-# echo "Snowflake external ID: $SNOWFLAKE_EXTERNAL_ID"
-
-# export TF_VAR_snowflake_aws_iam_user_arn=$SNOWFLAKE_IAM_USER_ARN
-# export TF_VAR_snowflake_external_id=$SNOWFLAKE_EXTERNAL_ID

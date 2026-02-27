@@ -12,5 +12,5 @@ resource "aws_secretsmanager_secret" "snowflake_password" {
 }
 
 resource "aws_secretsmanager_secret" "snowflake_dbt_user_private_key" {
-  name = "SNOWFLAKE_DBT_${upper(var.env)}_USER_PRIVATE_KEY"
+  name = "SNOWFLAKE_DBT_${upper(terraform.workspace)}_USER_PRIVATE_KEY"
 }

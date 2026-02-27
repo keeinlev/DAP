@@ -1,5 +1,5 @@
 resource "snowflake_database" "analytics" {
-  name = "ANALYTICS_${upper(var.env)}"
+  name = "ANALYTICS_${upper(terraform.workspace)}"
 }
 
 resource "snowflake_schema" "raw" {
@@ -41,7 +41,7 @@ resource "snowflake_file_format" "json_format" {
 }
 
 resource "snowflake_storage_integration" "s3" {
-  name                      = "S3_${upper(var.env)}_BUCKET_ACCESS"
+  name                      = "S3_${upper(terraform.workspace)}_BUCKET_ACCESS"
   storage_provider          = "S3"
   enabled                   = true
   storage_aws_role_arn      = aws_iam_role.snowflake_storage_integration.arn

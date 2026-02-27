@@ -22,12 +22,12 @@ data "aws_iam_policy_document" "snowflake_trust" {
 }
 
 resource "aws_iam_role" "snowflake_storage_integration" {
-  name               = "${title(var.env)}SnowflakeStorageIntegration"
+  name               = "${title(terraform.workspace)}SnowflakeStorageIntegration"
   assume_role_policy = data.aws_iam_policy_document.snowflake_trust.json
 }
 
 resource "aws_iam_role_policy" "snowflake_s3_access" {
-  name = "snowflake-${var.env}-s3-access"
+  name = "snowflake-${terraform.workspace}-s3-access"
   role = aws_iam_role.snowflake_storage_integration.id
 
   policy = jsonencode({

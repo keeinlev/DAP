@@ -1,14 +1,14 @@
 # Creating the user, role, warehouse, and grants for DBT to use in EC2
 
 resource "snowflake_warehouse" "transform_dbt" {
-  name           = "TRANSFORM_${upper(var.env)}"
+  name           = "TRANSFORM_${upper(terraform.workspace)}"
   warehouse_size = "XSMALL"
   auto_suspend   = 60
   auto_resume    = true
 }
 
 resource "snowflake_account_role" "dbt_role" {
-  name = "DBT_${upper(var.env)}_ROLE"
+  name = "DBT_${upper(terraform.workspace)}_ROLE"
 }
 
 # Privilege for ANALYTICS DB usage
@@ -95,8 +95,8 @@ resource "snowflake_grant_privileges_to_account_role" "dbt_dbt_schema_future_vie
 
 # Create DBT user
 resource "snowflake_user" "dbt_user" {
-  name          = "DBT_${upper(var.env)}_USER"
-  login_name    = "dbt_${var.env}"
+  name          = "DBT_${upper(terraform.workspace)}_USER"
+  login_name    = "dbt_${terraform.workspace}"
   default_role  = snowflake_account_role.dbt_role.name
   default_warehouse = snowflake_warehouse.transform_dbt.name
 

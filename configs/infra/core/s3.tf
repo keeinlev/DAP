@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "events" {
-  bucket = "dap-analytics-events-${var.env}"
+  bucket = "dap-analytics-events-${terraform.workspace}"
 }
 
 resource "aws_s3_bucket_versioning" "events_versioning" {

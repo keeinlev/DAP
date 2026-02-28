@@ -5,7 +5,7 @@ target
 logs
 .terraform*
 terraform.tfstate
-terraform.tfstate.backup
+terraform.tfstate.*
 *auto.tfvars
 keys
 *.pem

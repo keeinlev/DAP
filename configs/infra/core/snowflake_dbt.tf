@@ -100,7 +100,7 @@ resource "snowflake_user" "dbt_user" {
   default_role  = snowflake_account_role.dbt_role.name
   default_warehouse = snowflake_warehouse.transform_dbt.name
 
-  rsa_public_key = file("${path.module}/keys/dbt_public_key.pub")
+  rsa_public_key = file("${path.module}/keys/dbt_${terraform.workspace}_public_key.pub")
 }
 
 # Assign role to user

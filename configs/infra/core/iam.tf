@@ -1,3 +1,10 @@
+locals {
+  external_id = data.aws_ssm_parameter.snowflake_external_id.value
+  iam_user_arn = data.aws_ssm_parameter.snowflake_iam_user_arn.value
+
+  is_bootstrapped = (local.external_id != "null" && local.iam_user_arn != "null") 
+}
+
 data "aws_caller_identity" "current" {}
 
 data "aws_iam_policy_document" "snowflake_trust" {
@@ -6,16 +13,16 @@ data "aws_iam_policy_document" "snowflake_trust" {
 
     principals {
       type = "AWS"
-      identifiers = length(var.snowflake_aws_iam_user_arn) > 0 ? [var.snowflake_aws_iam_user_arn] : ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+      identifiers = local.is_bootstrapped ? [local.iam_user_arn] : ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
     }
 
     dynamic "condition" {
-      for_each = length(var.snowflake_external_id) > 0 ? [1] : []
+      for_each = local.is_bootstrapped ? [1] : []
 
       content {
         test     = "StringEquals"
         variable = "sts:ExternalId"
-        values   = [var.snowflake_external_id]
+        values   = [local.external_id]
       }
     }
   }

@@ -10,3 +10,4 @@ terraform.tfstate.*
 keys
 *.pem
 *.pub
+.DS_Store

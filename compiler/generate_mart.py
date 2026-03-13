@@ -3,7 +3,7 @@ import yaml
 from util import *
 
 MART_PIPELINES_DIR = Path("configs/pipelines")
-OUT_DIR = Path("dbt/models/mart")
+OUT_DIR = Path("dbt/models/generated/mart")
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 schema_yaml = {

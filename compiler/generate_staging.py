@@ -1,8 +1,9 @@
 from pathlib import Path
-import yaml
+from util import parse_event_yamls
+from model.field_type import FieldType
 
 EVENT_DIR = Path("configs/events")
-OUT_DIR = Path("dbt/models/staging")
+OUT_DIR = Path("dbt/models/generated/staging")
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 schema_yaml = {
@@ -10,22 +11,24 @@ schema_yaml = {
     "models": []
 }
 
-for path in EVENT_DIR.glob("*.yaml"):
-    event = yaml.safe_load(open(path))
-    name = event["name"]
-    schema = event["schema"]
-
-    fields = []
-    for col, typ in schema.items():
+for schema in parse_event_yamls(EVENT_DIR):
+    name = schema.name
+    sf_fields = []
+    for field in schema.fields:
+        col = field.name
+        typ = field.type
         snowflake_type = "STRING"
-        if typ == "float":
+        if typ == FieldType.FLOAT:
             snowflake_type = "FLOAT"
-        elif typ == "timestamp":
+        elif typ == FieldType.TIMESTAMP:
             snowflake_type = "TIMESTAMP"
+        elif typ == FieldType.INT:
+            snowflake_type = "NUMBER"
+        elif typ == FieldType.BOOLEAN:
+            snowflake_type = "BOOLEAN"
 
-        fields.append(f"data:{col}::{snowflake_type} AS {col}")
-
-    fields_str = ",\n        ".join(fields)
+        sf_fields.append(f"data:{col}::{snowflake_type} AS {col}")
+    fields_str = ",\n        ".join(sf_fields)
     sql = f"""
 WITH base AS (
     SELECT
@@ -43,15 +46,13 @@ SELECT * FROM base
 
     (OUT_DIR / f"stg_{name}.sql").write_text(sql)
 
-    schema["event_id"] = "string"
-
     schema_yaml["models"].append({
         "name": f"stg_{name}",
         "columns": [
-            {"name": c, "tests": ["not_null"]}
-            for c in schema.keys()
-        ]
+            {"name": f.name, "tests": ["not_null"]}
+            for f in schema.fields
+        ] + [{"name": "event_id", "tests": ["not_null"]}]
     })
 
 import yaml
-(Path("dbt/models/staging/schema.yml")).write_text(yaml.dump(schema_yaml))
+(OUT_DIR / Path("schema.yml")).write_text(yaml.dump(schema_yaml))

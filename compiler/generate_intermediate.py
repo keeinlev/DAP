@@ -2,7 +2,7 @@ from pathlib import Path
 import yaml
 
 EVENT_GROUPS_DIR = Path("configs/event_groups")
-OUT_DIR = Path("dbt/models/intermediate")
+OUT_DIR = Path("dbt/models/generated/intermediate")
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 schema_yaml = {

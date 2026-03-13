@@ -2,13 +2,21 @@ name: product_click
 version: 2
 description: User clicks on a product
 
-timestamp_field: ts
-
 schema:
-  user_id: string
-  visit_id: string
-  product_id: string
-  request_id: string
-  ts: timestamp
+  user_id:
+    type: string
+    required: true
+  visit_id:
+    type: string
+    required: true
+  product_id:
+    type: string
+    required: true
+  request_id:
+    type: string
+    required: true
+  ts:
+    type: timestamp
+    required: true
 
 default_destination: analytics_db

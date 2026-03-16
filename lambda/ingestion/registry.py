@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-SCHEMA_DIR = Path("generated/schemas")
+SCHEMA_DIR = Path("./schemas")
 
 REGISTRY = {}
 

@@ -7,3 +7,5 @@ variable "snowflake_role" {
   type = string
   default = "ACCOUNTADMIN"
 }
+
+variable "deploy_lambda" {}

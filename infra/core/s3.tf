@@ -18,3 +18,12 @@ resource "aws_s3_bucket_public_access_block" "events_block" {
   ignore_public_acls  = true
   restrict_public_buckets = true
 }
+
+resource "aws_s3_bucket_notification" "snowpipe" {
+  bucket = aws_s3_bucket.events.id
+
+  queue {
+    queue_arn = aws_sqs_queue.snowpipe.arn
+    events    = ["s3:ObjectCreated:*"]
+  }
+}

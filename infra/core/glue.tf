@@ -1,3 +1,5 @@
+# For receiving Firehose events in Parquet
+
 resource "aws_glue_catalog_database" "events" {
   name = "dap_events_${terraform.workspace}"
 }

@@ -32,7 +32,7 @@ resource "aws_glue_catalog_table" "events" {
 
     columns {
       name = "payload"
-      type = "struct"
+      type = "string"
     }
   }
 }

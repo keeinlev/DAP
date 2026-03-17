@@ -26,7 +26,7 @@ def handler(event, context):
         }
 
         records.append({
-            "Data": json.dump(envelope),
+            "Data": json.dumps(envelope),
             "PartitionKey": envelope["event_type"]
         })
 

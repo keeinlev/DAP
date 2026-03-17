@@ -87,9 +87,16 @@ resource "snowflake_pipe" "events" {
   auto_ingest = true
 
   copy_statement = <<SQL
-COPY INTO ${snowflake_database.analytics.name}.${snowflake_schema.raw.name}.${snowflake_table.events.name}
-FROM @${snowflake_database.analytics.name}.${snowflake_schema.raw.name}.${snowflake_stage.events_stage.name}
+COPY INTO ${snowflake_database.analytics.name}.${snowflake_schema.raw.name}.${snowflake_table.events.name} (event_id, event_type, event_version, ingested_at, payload)
+FROM (
+  SELECT
+    $1:event_id::string,
+    $1:event_type::string,
+    $1:event_version::int,
+    $1:ingested_at::timestamp_ntz(9),
+    PARSE_JSON($1:payload)
+    FROM @${snowflake_database.analytics.name}.${snowflake_schema.raw.name}.${snowflake_stage.events_stage.name}
+)
 FILE_FORMAT = (TYPE = PARQUET)
-MATCH_BY_COLUMN_NAME = CASE_INSENSITIVE
 SQL
 }

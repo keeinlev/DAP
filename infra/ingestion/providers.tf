@@ -11,6 +11,11 @@ terraform {
       source  = "snowflakedb/snowflake"
       version = "~> 0.90"
     }
+
+    null = {
+      source  = "hashicorp/null"
+      version = "~> 3.2.4"
+    }
   }
 }
 

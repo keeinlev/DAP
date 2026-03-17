@@ -1,4 +1,19 @@
+resource "null_resource" "wait_for_role_propagation" {
+  provisioner "local-exec" {
+    command = "sleep 10"  # Introduces a 10-second delay because the IAM role for the Snowflake Integration update needs to complete before the Snowpipe creation kicks off.
+                            # Even with the depends_on, it starts too soon without a buffer delay.
+  }
+
+  depends_on = [
+    var.aws_iam_snowflake_integration_policy
+  ]
+}
+
 resource "snowflake_pipe" "events" {
+  # Snowpipe requires the Snowflake Integration IAM role to be updated, but it is not an explicit dependency in the TF graph, so without a depends_on chain leading back to the
+  # role policy, the Snowpipe creation will precede the IAM role update, and will throw an access error. An additional time delay is needed to allow the update to propagate before
+  # the Snowpipe can be created (see above null_resource).
+  depends_on = [ null_resource.wait_for_role_propagation ]
   name     = "DAP_EVENTS_PIPE"
   database = var.snowflake_db_name
   schema   = var.snowflake_raw_schema_name

@@ -37,3 +37,8 @@ output "snowflake_stage_name" {
   description = "Snowflake stage name"
   value = snowflake_stage.events_stage.name
 }
+
+output "aws_iam_snowflake_integration_policy" {
+  description = "Anchor for ingestion Snowpipe to depend on"
+  value = aws_iam_role.snowflake_storage_integration.assume_role_policy
+}

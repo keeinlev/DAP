@@ -14,6 +14,8 @@ module "ingestion" {
   snowflake_raw_schema_name = module.core.snowflake_raw_schema_name
   snowflake_raw_events_table_name = module.core.snowflake_raw_events_table_name
   snowflake_stage_name = module.core.snowflake_stage_name
+  aws_iam_snowflake_integration_policy = module.core.aws_iam_snowflake_integration_policy
   aws_region = var.aws_region
   snowflake_role = var.snowflake_role
+  lambda_ingestion_img_id = var.lambda_ingestion_img_id
 }

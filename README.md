@@ -32,7 +32,7 @@ This project is exploratory and focused on correctness and simplicity rather tha
 
 (You can follow [this tutorial](https://www.youtube.com/watch?v=Qfg6hRY4Tq0), starting at timestamp 16:37 until 25:43, or follow the steps below)
 
-The following is a guide designed for everyone and anyone to follow, If you know what you are doing please go ahead and skip this. I am writing this guide on a Saturday night at 9pm for goodness' sake I will not take any crap for long documentation.
+The following is a guide designed for everyone and anyone to follow, If you know what you are doing you may skip this.
 
 1. Log into your AWS account on the Console.
 
@@ -140,8 +140,8 @@ Each variable can be retrieved by following the [Snowflake Setup](#2-snowflake-s
 - Snowflake (storage + compute)
 - dbt (transformations)
 - Python (YAML → SQL compiler)
-- Airflow (planned orchestration)
-- Terraform (planned infrastructure)
+- Airflow (orchestration)
+- Terraform (infrastructure)
 
 ---
 
@@ -300,16 +300,19 @@ Non-goals:
 
 Currently implemented:
 
-* YAML → dbt mart compiler
+* Terraform-managed infrastructure
+* full AWS + Snowflake ingestion pipeline
+* YAML → SQL compiler
 * group-based incremental marts
 * event-driven metric definitions
+* declarative event spine construction
+* Event schema validation
 
 Planned:
 
 * Airflow orchestration
-* Terraform-managed infrastructure
 * environment separation
-* YAML validation
+* schema evolution support
 
 ---
 

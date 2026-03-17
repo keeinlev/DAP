@@ -149,7 +149,7 @@ Each variable can be retrieved by following the [Snowflake Setup](#2-snowflake-s
 
 ```
 
-events → Flask → S3 → Snowflake raw
+events → API Gateway → Lambda → Kinesis/Firehose/Glue → S3 → Snowflake raw
 |
 v
 YAML events schemas
@@ -158,7 +158,7 @@ v
 generate_staging.py
 |
 v
-dbt staging
+dbt staging (canonicalize each event in their own table)
 |
 v
 YAML event groups
@@ -167,13 +167,13 @@ v
 generate_intermediate.py
 |
 v
-dbt intermediate (event spine)
+dbt intermediate (event spine based on event groupings)
 |
 v
 YAML pipelines
 |
 v
-generate_mart.py
+generate_mart.py (metrics based on declared transformations, automated joins)
 |
 v
 dbt marts

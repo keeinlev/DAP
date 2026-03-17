@@ -16,6 +16,7 @@ This project is exploratory and focused on correctness and simplicity rather tha
 ## System Requirements
 
 - Python 3.12+
+- Docker
 - AWS CLI
 - Terraform
 - Git Bash (if on Windows)

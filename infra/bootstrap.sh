@@ -8,8 +8,8 @@ mkdir -p core/keys
 openssl genrsa -out core/keys/dbt_${ENV}_private_key.pem 2048
 openssl rsa -in core/keys/dbt_${ENV}_private_key.pem -pubout -out core/keys/dbt_${ENV}_public_key.pub
 
-echo "=== Phase 2: Terraform AWS bootstrap ==="
-dotenv run -- terraform apply -auto-approve
+echo "=== Phase 2: Terraform AWS bootstrap core ==="
+dotenv run -- terraform apply -target=module.core -auto-approve
 
 echo "=== Phase 3: Fetch and Persist Snowflake IAM details ==="
 
@@ -24,7 +24,7 @@ aws ssm put-parameter --cli-input-json '{"Name": "/dap/'$ENV'/snowflake_iam_user
 aws ssm put-parameter --cli-input-json '{"Name": "/dap/'$ENV'/snowflake_external_id", "Value": "'$SNOWFLAKE_EXTERNAL_ID'", "Type": "String", "Overwrite": true}' \
   --profile terraform-admin
 
-echo "=== Phase 4: Terraform finalize ==="
-dotenv run -- terraform apply -auto-approve
+echo "=== Phase 4: Terraform finalize core ==="
+dotenv run -- terraform apply -target=module.core -auto-approve
 
-echo "Bootstrap complete."
+echo "Core bootstrap complete. Push the ingestion Lambda image to the ECR repo, then run one last 'dotenv run -- terraform apply'"

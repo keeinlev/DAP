@@ -76,27 +76,3 @@ resource "snowflake_stage" "events_stage" {
   storage_integration = snowflake_storage_integration.s3.name
   file_format         = "FORMAT_NAME = ${snowflake_database.analytics.name}.${snowflake_schema.raw.name}.${snowflake_file_format.parquet_format.name}"
 }
-
-resource "snowflake_pipe" "events" {
-  count = local.is_bootstrapped ? 1 : 0
-
-  name     = "DAP_EVENTS_PIPE"
-  database = snowflake_database.analytics.name
-  schema   = snowflake_schema.raw.name
-
-  auto_ingest = true
-
-  copy_statement = <<SQL
-COPY INTO ${snowflake_database.analytics.name}.${snowflake_schema.raw.name}.${snowflake_table.events.name} (event_id, event_type, event_version, ingested_at, payload)
-FROM (
-  SELECT
-    $1:event_id::string,
-    $1:event_type::string,
-    $1:event_version::int,
-    $1:ingested_at::timestamp_ntz(9),
-    PARSE_JSON($1:payload)
-    FROM @${snowflake_database.analytics.name}.${snowflake_schema.raw.name}.${snowflake_stage.events_stage.name}
-)
-FILE_FORMAT = (TYPE = PARQUET)
-SQL
-}

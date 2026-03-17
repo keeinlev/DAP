@@ -60,27 +60,27 @@ resource "aws_iam_role_policy" "snowflake_s3_access" {
 
 # For Snowpipe
 
-resource "aws_sqs_queue_policy" "snowpipe" {
-  queue_url = aws_sqs_queue.snowpipe.id
+# resource "aws_sqs_queue_policy" "snowpipe" {
+#   queue_url = data.aws_sqs_queue.snowpipe.url
 
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Sid = "AllowS3ToSendMessages"
-      Effect = "Allow"
-      Principal = {
-        Service = "s3.amazonaws.com"
-      }
-      Action = "sqs:SendMessage"
-      Resource = aws_sqs_queue.snowpipe.arn
-      Condition = {
-        ArnEquals = {
-          "aws:SourceArn" = aws_s3_bucket.events.arn
-        }
-      }
-    }]
-  })
-}
+#   policy = jsonencode({
+#     Version = "2012-10-17"
+#     Statement = [{
+#       Sid = "AllowS3ToSendMessages"
+#       Effect = "Allow"
+#       Principal = {
+#         Service = "s3.amazonaws.com"
+#       }
+#       Action = "sqs:SendMessage"
+#       Resource = snowflake_pipe.events[0].notification_channel
+#       Condition = {
+#         ArnEquals = {
+#           "aws:SourceArn" = aws_s3_bucket.events.arn
+#         }
+#       }
+#     }]
+#   })
+# }
 
 # For Firehose access
 
@@ -110,7 +110,8 @@ resource "aws_iam_role_policy" "firehose" {
         Action = [
           "kinesis:DescribeStream",
           "kinesis:GetShardIterator",
-          "kinesis:GetRecords"
+          "kinesis:GetRecords",
+          "kinesis:ListShards"
         ]
         Resource = aws_kinesis_stream.events_stream.arn
       },
@@ -141,10 +142,10 @@ resource "aws_iam_role_policy" "firehose" {
   })
 }
 
-# For Lambda ECR access
+# For Lambda ECR and Kinesis access
 
-resource "aws_iam_role" "lambda_ecr_role" {
-  name = "dap-${terraform.workspace}-lambda-ecr-role"
+resource "aws_iam_role" "lambda_exec_role" {
+  name = "dap-${terraform.workspace}-lambda-exec-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -158,8 +159,8 @@ resource "aws_iam_role" "lambda_ecr_role" {
   })
 }
 
-resource "aws_iam_role_policy" "lambda_ecr_role_policy" {
-  role = aws_iam_role.lambda_ecr_role.id
+resource "aws_iam_role_policy" "lambda_ecr" {
+  role = aws_iam_role.lambda_exec_role.id
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -173,6 +174,14 @@ resource "aws_iam_role_policy" "lambda_ecr_role_policy" {
           "ecr:GetDownloadUrlForLayer"
         ]
         Resource = aws_ecr_repository.ingestion_lambda.arn
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "kinesis:PutRecords",
+          "kinesis:DescribeStream"
+        ]
+        Resource = aws_kinesis_stream.events_stream.arn
       }
     ]
   })

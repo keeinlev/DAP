@@ -23,7 +23,7 @@ resource "aws_s3_bucket_notification" "snowpipe" {
   bucket = aws_s3_bucket.events.id
 
   queue {
-    queue_arn = aws_sqs_queue.snowpipe.arn
+    queue_arn = snowflake_pipe.events[0].notification_channel
     events    = ["s3:ObjectCreated:*"]
   }
 }

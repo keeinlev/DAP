@@ -26,13 +26,13 @@ resource "aws_glue_catalog_table" "events" {
     }
 
     columns {
-      name = "timestamp"
+      name = "ingested_at"
       type = "bigint"
     }
 
     columns {
       name = "payload"
-      type = "string"
+      type = "struct"
     }
   }
 }

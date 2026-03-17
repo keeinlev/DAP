@@ -23,11 +23,6 @@ resource "snowflake_table" "events" {
   }
 
   column {
-    name = "EVENT_NAME"
-    type = "STRING"
-  }
-
-  column {
     name = "EVENT_VERSION"
     type = "INTEGER"
   }
@@ -40,6 +35,11 @@ resource "snowflake_table" "events" {
   column {
     name = "PAYLOAD"
     type = "VARIANT"
+  }
+
+  column {
+    name = "EVENT_TYPE"
+    type = "STRING"
   }
 }
 

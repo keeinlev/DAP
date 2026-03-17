@@ -12,6 +12,11 @@ resource "aws_kinesis_firehose_delivery_stream" "events_firehose_stream" {
   name        = "dap-kinesis-firehose-stream-${terraform.workspace}"
   destination = "extended_s3"
 
+  kinesis_source_configuration {
+    kinesis_stream_arn = aws_kinesis_stream.events_stream.arn
+    role_arn           = aws_iam_role.firehose.arn
+  }
+
   extended_s3_configuration {
     role_arn   = aws_iam_role.firehose.arn
     bucket_arn = aws_s3_bucket.events.arn

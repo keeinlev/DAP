@@ -22,6 +22,7 @@ resource "aws_api_gateway_method" "proxy" {
   resource_id = aws_api_gateway_resource.root.id
   http_method = "POST"
   authorization = "NONE"
+  api_key_required = true
 }
 
 resource "aws_api_gateway_integration" "lambda_integration" {
@@ -70,9 +71,48 @@ resource "aws_api_gateway_integration_response" "proxy" {
 
 # Deployment stage
 
-resource "aws_api_gateway_deployment" "deployment" {
+resource "aws_api_gateway_deployment" "ingestion_deployment" {
   rest_api_id = aws_api_gateway_rest_api.ingestion_api.id
-  depends_on = [
-    aws_api_gateway_integration.lambda_integration,
-  ]
+  
+  triggers = {
+    redeployment = sha1(jsonencode([
+      aws_api_gateway_rest_api.ingestion_api.body,
+      aws_api_gateway_method.proxy,
+      aws_api_gateway_integration.lambda_integration
+    ]))
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_api_gateway_stage" "ingestion_stage" {
+  deployment_id = aws_api_gateway_deployment.ingestion_deployment.id
+  rest_api_id   = aws_api_gateway_rest_api.ingestion_api.id
+  stage_name    = "dap-${terraform.workspace}-ingestion-api-stage"
+}
+
+resource "aws_api_gateway_api_key" "ingestion_api_key" {
+  name = "dap-${terraform.workspace}-ingestion-api-key"
+}
+
+resource "aws_api_gateway_usage_plan" "ingestion_usage_plan" {
+  name = "dap-${terraform.workspace}-events-usage-plan"
+
+  api_stages {
+    api_id = aws_api_gateway_rest_api.ingestion_api.id
+    stage  = aws_api_gateway_stage.ingestion_stage.stage_name
+  }
+
+  throttle_settings {
+    burst_limit = 100
+    rate_limit  = 50
+  }
+}
+
+resource "aws_api_gateway_usage_plan_key" "ingestion_usage_plan_key" {
+  key_id      = aws_api_gateway_api_key.ingestion_api_key.id
+  key_type    = "API_KEY"
+  usage_plan_id = aws_api_gateway_usage_plan.ingestion_usage_plan.id
 }

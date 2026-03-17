@@ -5,11 +5,11 @@ import boto3
 from validator import validate_event
 
 kinesis = boto3.client("kinesis")
-STREAM_NAME = "dap-events-stream"
+STREAM_NAME = "dap-kinesis-stream-dev" # IMPORTANT: CHANGE THIS TO BE INJECTED BY WORKFLOW
 
 
 def handler(event, context):
-    body = json.loads(event["body"])
+    body = event["body"]
     events = body["events"]
 
     records = []
@@ -21,12 +21,12 @@ def handler(event, context):
             "event_id": str(uuid.uuid4()),
             "event_type": e["event_type"],
             "event_version": e["event_version"],
-            "timestamp": int(time.time() * 1000),
+            "ingested_at": int(time.time() * 1000),
             "payload": e["payload"],
         }
 
         records.append({
-            "Data": json.dumps(envelope),
+            "Data": json.dump(envelope),
             "PartitionKey": envelope["event_type"]
         })
 

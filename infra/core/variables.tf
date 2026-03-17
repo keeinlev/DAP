@@ -1,9 +1,3 @@
-variable "aws_region" {
-  type    = string
-  default = "us-east-2"
-}
+variable "aws_region" {}
 
-variable "snowflake_role" {
-  type = string
-  default = "ACCOUNTADMIN"
-}
+variable "snowflake_role" {}

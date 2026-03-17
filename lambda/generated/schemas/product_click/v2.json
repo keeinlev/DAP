@@ -1,0 +1,28 @@
+{
+  "properties": {
+    "product_id": {
+      "type": "string"
+    },
+    "request_id": {
+      "type": "string"
+    },
+    "ts": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "user_id": {
+      "type": "string"
+    },
+    "visit_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "user_id",
+    "visit_id",
+    "product_id",
+    "request_id",
+    "ts"
+  ],
+  "type": "object"
+}

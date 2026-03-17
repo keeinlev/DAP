@@ -1,3 +1,5 @@
+# For Snowflake integration
+
 locals {
   external_id = data.aws_ssm_parameter.snowflake_external_id.value
   iam_user_arn = data.aws_ssm_parameter.snowflake_iam_user_arn.value
@@ -55,3 +57,27 @@ resource "aws_iam_role_policy" "snowflake_s3_access" {
     ]
   })
 }
+
+# For Snowpipe
+
+# resource "aws_sqs_queue_policy" "snowpipe" {
+#   queue_url = data.aws_sqs_queue.snowpipe.url
+
+#   policy = jsonencode({
+#     Version = "2012-10-17"
+#     Statement = [{
+#       Sid = "AllowS3ToSendMessages"
+#       Effect = "Allow"
+#       Principal = {
+#         Service = "s3.amazonaws.com"
+#       }
+#       Action = "sqs:SendMessage"
+#       Resource = snowflake_pipe.events[0].notification_channel
+#       Condition = {
+#         ArnEquals = {
+#           "aws:SourceArn" = aws_s3_bucket.events.arn
+#         }
+#       }
+#     }]
+#   })
+# }

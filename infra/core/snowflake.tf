@@ -18,8 +18,13 @@ resource "snowflake_table" "events" {
   name     = "EVENTS"
 
   column {
-    name = "EVENT_NAME"
+    name = "EVENT_ID"
     type = "STRING"
+  }
+
+  column {
+    name = "EVENT_VERSION"
+    type = "INTEGER"
   }
 
   column {
@@ -28,8 +33,13 @@ resource "snowflake_table" "events" {
   }
 
   column {
-    name = "DATA"
+    name = "PAYLOAD"
     type = "VARIANT"
+  }
+
+  column {
+    name = "EVENT_TYPE"
+    type = "STRING"
   }
 }
 
@@ -38,6 +48,13 @@ resource "snowflake_file_format" "json_format" {
   database = snowflake_database.analytics.name
   schema   = snowflake_schema.raw.name
   format_type = "JSON"
+}
+
+resource "snowflake_file_format" "parquet_format" {
+  name     = "PARQUET_FORMAT"
+  database = snowflake_database.analytics.name
+  schema   = snowflake_schema.raw.name
+  format_type = "PARQUET"
 }
 
 resource "snowflake_storage_integration" "s3" {
@@ -57,5 +74,5 @@ resource "snowflake_stage" "events_stage" {
   schema              = snowflake_schema.raw.name
   url                 = "s3://${aws_s3_bucket.events.bucket}"
   storage_integration = snowflake_storage_integration.s3.name
-  file_format         = "FORMAT_NAME = ${snowflake_database.analytics.name}.${snowflake_schema.raw.name}.${snowflake_file_format.json_format.name}"
+  file_format         = "FORMAT_NAME = ${snowflake_database.analytics.name}.${snowflake_schema.raw.name}.${snowflake_file_format.parquet_format.name}"
 }

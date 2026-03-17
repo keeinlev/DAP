@@ -173,10 +173,10 @@ v
 YAML pipelines
 |
 v
-generate_mart.py (metrics based on declared transformations, automated joins)
+generate_mart.py
 |
 v
-dbt marts
+dbt marts (metrics based on declared transformations, automated joins)
 
 ```
 
